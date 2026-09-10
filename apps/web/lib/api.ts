@@ -1,6 +1,8 @@
 import type { AgentMeta, AgentRun, CompanyProfile } from "@/types";
 
-const rawApiUrl = process.env.NEXT_PUBLIC_API_URL;
+const rawApiUrl =
+  process.env.NEXT_PUBLIC_API_URL ??
+  "https://revenue-agentapi-production-295a.up.railway.app/";
 
 if (!rawApiUrl) {
   throw new Error("NEXT_PUBLIC_API_URL is not configured.");
