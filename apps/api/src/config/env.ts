@@ -3,7 +3,9 @@ import { z } from "zod";
 
 const schema = z.object({
   PORT: z.coerce.number().default(4100),
-  WEB_ORIGIN: z.string().default("http://localhost:3000"),
+  WEB_ORIGIN: z
+    .string()
+    .default("https://revenue-agentweb-production.up.railway.app/"),
   AI_PROVIDER: z.enum(["mock", "gemini"]).default("mock"),
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_MODEL: z.string().default("gemini-3.7-flash"),
