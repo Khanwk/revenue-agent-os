@@ -12,7 +12,8 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: env.WEB_ORIGIN,
+    origin:
+      env.WEB_ORIGIN ?? "https://revenue-agentweb-production.up.railway.app/",
   },
 });
 

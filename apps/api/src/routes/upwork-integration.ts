@@ -81,11 +81,15 @@ upworkIntegrationRouter.get("/callback", async (req, res) => {
       expires_in?: number;
     };
     await saveUpworkToken(token);
-    return res.redirect(`${env.WEB_ORIGIN}/?upwork=connected`);
+    return res.redirect(
+      `${env.WEB_ORIGIN ?? "https://revenue-agentweb-production.up.railway.app/"}/?upwork=connected`,
+    );
   } catch (error) {
     const message = encodeURIComponent(
       error instanceof Error ? error.message : "Upwork OAuth failed",
     );
-    return res.redirect(`${env.WEB_ORIGIN}/?upworkError=${message}`);
+    return res.redirect(
+      `${env.WEB_ORIGIN ?? "https://revenue-agentweb-production.up.railway.app/"}/?upworkError=${message}`,
+    );
   }
 });
