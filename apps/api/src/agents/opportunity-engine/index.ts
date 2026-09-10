@@ -1,1 +1,1 @@
-export { opportunityEngineAgent } from "./agent.js";
+export { opportunityEngineAgent } from "./agent";

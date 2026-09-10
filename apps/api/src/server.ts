@@ -1,9 +1,9 @@
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-import { createApp } from "./app.js";
-import { env } from "./config/env.js";
-import { registerAgents } from "./agents/index.js";
-import { bindSocketServer } from "./core/events.js";
+import { createApp } from "./app";
+import { env } from "./config/env";
+import { registerAgents } from "./agents/index";
+import { bindSocketServer } from "./core/events";
 
 registerAgents();
 

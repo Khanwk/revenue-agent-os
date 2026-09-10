@@ -1,6 +1,9 @@
-import { env } from "../config/env.js";
-import { getValidUpworkAccessToken, hasStoredUpworkToken } from "../integrations/upwork-token-store.js";
-import type { DiscoveredOpportunity, OpportunitySource } from "./types.js";
+import { env } from "../config/env";
+import {
+  getValidUpworkAccessToken,
+  hasStoredUpworkToken,
+} from "../integrations/upwork-token-store";
+import type { DiscoveredOpportunity, OpportunitySource } from "./types";
 
 type GqlResponse = { data?: any; errors?: Array<{ message?: string }> };
 
@@ -10,15 +13,26 @@ async function gql(query: string, variables: Record<string, unknown>) {
   const headers: Record<string, string> = {
     Authorization: `Bearer ${accessToken}`,
     "Content-Type": "application/json",
-    Accept: "application/json"
+    Accept: "application/json",
   };
-  if (env.UPWORK_TENANT_ID) headers["X-Upwork-API-TenantId"] = env.UPWORK_TENANT_ID;
+  if (env.UPWORK_TENANT_ID)
+    headers["X-Upwork-API-TenantId"] = env.UPWORK_TENANT_ID;
   const response = await fetch(env.UPWORK_GRAPHQL_URL, {
-    method: "POST", headers, body: JSON.stringify({ query, variables }), signal: AbortSignal.timeout(15000)
+    method: "POST",
+    headers,
+    body: JSON.stringify({ query, variables }),
+    signal: AbortSignal.timeout(15000),
   });
-  if (!response.ok) throw new Error(`Upwork API returned HTTP ${response.status}`);
-  const json = await response.json() as GqlResponse;
-  if (json.errors?.length) throw new Error(`Upwork API: ${json.errors.map((e) => e.message).filter(Boolean).join("; ")}`);
+  if (!response.ok)
+    throw new Error(`Upwork API returned HTTP ${response.status}`);
+  const json = (await response.json()) as GqlResponse;
+  if (json.errors?.length)
+    throw new Error(
+      `Upwork API: ${json.errors
+        .map((e) => e.message)
+        .filter(Boolean)
+        .join("; ")}`,
+    );
   return json.data;
 }
 
@@ -40,20 +54,35 @@ query JobContents($ids: [ID!]!) {
 
 export const upworkOpportunitySource: OpportunitySource = {
   status: () => ({
-    id: "upwork", label: "Upwork", platform: "upwork", configured: hasStoredUpworkToken(),
-    note: hasStoredUpworkToken() ? "Official Upwork GraphQL API connected." : "Connect an approved Upwork OAuth app with marketplace job-read scope."
+    id: "upwork",
+    label: "Upwork",
+    platform: "upwork",
+    configured: hasStoredUpworkToken(),
+    note: hasStoredUpworkToken()
+      ? "Official Upwork GraphQL API connected."
+      : "Connect an approved Upwork OAuth app with marketplace job-read scope.",
   }),
   async search(input) {
     if (!hasStoredUpworkToken()) return [];
     const data = await gql(SEARCH_QUERY, {
       filter: { titleExpression_eq: input.query },
       searchType: "USER_JOBS_SEARCH",
-      sortAttributes: [{ field: "RECENCY" }]
+      sortAttributes: [{ field: "RECENCY" }],
     });
-    const nodes = (data?.marketplaceJobPostingsSearch?.edges ?? []).map((edge: any) => edge?.node).filter(Boolean).slice(0, input.limit);
+    const nodes = (data?.marketplaceJobPostingsSearch?.edges ?? [])
+      .map((edge: any) => edge?.node)
+      .filter(Boolean)
+      .slice(0, input.limit);
     if (!nodes.length) return [];
-    const contentsData = await gql(CONTENT_QUERY, { ids: nodes.map((node: any) => String(node.id)) });
-    const contents = new Map((contentsData?.marketplaceJobPostingsContents ?? []).map((item: any) => [String(item.id), item]));
+    const contentsData = await gql(CONTENT_QUERY, {
+      ids: nodes.map((node: any) => String(node.id)),
+    });
+    const contents = new Map(
+      (contentsData?.marketplaceJobPostingsContents ?? []).map((item: any) => [
+        String(item.id),
+        item,
+      ]),
+    );
     return nodes.map((node: any): DiscoveredOpportunity => {
       const content: any = contents.get(String(node.id));
       const ciphertext = String(content?.ciphertext || "");
@@ -67,10 +96,14 @@ export const upworkOpportunitySource: OpportunitySource = {
         budget: "See Upwork listing",
         skills: [],
         clientInfo: "See Upwork client details",
-        url: ciphertext ? `https://www.upwork.com/jobs/${ciphertext.startsWith("~") ? ciphertext : `~${ciphertext}`}` : undefined,
-        postedAt: content?.publishedDateTime ? String(content.publishedDateTime) : undefined,
-        projectType: "unknown"
+        url: ciphertext
+          ? `https://www.upwork.com/jobs/${ciphertext.startsWith("~") ? ciphertext : `~${ciphertext}`}`
+          : undefined,
+        postedAt: content?.publishedDateTime
+          ? String(content.publishedDateTime)
+          : undefined,
+        projectType: "unknown",
       };
     });
-  }
+  },
 };

@@ -1,6 +1,6 @@
-import { agentRegistry } from "./agent-registry.js";
-import { runStore } from "./run-store.js";
-import { publishRun } from "./events.js";
+import { agentRegistry } from "./agent-registry";
+import { runStore } from "./run-store";
+import { publishRun } from "./events";
 
 class AgentRunner {
   createRun(agentId: string, rawInput: unknown) {
@@ -17,11 +17,13 @@ class AgentRunner {
     try {
       const output = await agent.execute(run.input, {
         runId,
-        report: (status, label, message, detail) => publishRun(runStore.addEvent(runId, status, label, message, detail))
+        report: (status, label, message, detail) =>
+          publishRun(runStore.addEvent(runId, status, label, message, detail)),
       });
       publishRun(runStore.complete(runId, output));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown agent failure";
+      const message =
+        error instanceof Error ? error.message : "Unknown agent failure";
       publishRun(runStore.fail(runId, message));
     }
   }

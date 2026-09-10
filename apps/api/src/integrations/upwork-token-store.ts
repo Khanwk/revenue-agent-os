@@ -1,7 +1,7 @@
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { env } from "../config/env.js";
+import { env } from "../config/env";
 
 interface UpworkTokenFile {
   accessToken: string;
@@ -18,7 +18,10 @@ export function hasStoredUpworkToken() {
 
 async function readToken(): Promise<UpworkTokenFile | undefined> {
   if (env.UPWORK_ACCESS_TOKEN) {
-    return { accessToken: env.UPWORK_ACCESS_TOKEN, expiresAt: Number.MAX_SAFE_INTEGER };
+    return {
+      accessToken: env.UPWORK_ACCESS_TOKEN,
+      expiresAt: Number.MAX_SAFE_INTEGER,
+    };
   }
 
   try {
@@ -43,7 +46,8 @@ export async function saveUpworkToken(payload: {
 }
 
 async function refresh(token: UpworkTokenFile) {
-  if (!token.refreshToken || !env.UPWORK_CLIENT_ID || !env.UPWORK_CLIENT_SECRET) return token;
+  if (!token.refreshToken || !env.UPWORK_CLIENT_ID || !env.UPWORK_CLIENT_SECRET)
+    return token;
 
   const body = new URLSearchParams({
     grant_type: "refresh_token",
@@ -54,12 +58,18 @@ async function refresh(token: UpworkTokenFile) {
 
   const response = await fetch("https://www.upwork.com/api/v3/oauth2/token", {
     method: "POST",
-    headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
     body,
     signal: AbortSignal.timeout(15_000),
   });
 
-  if (!response.ok) throw new Error(`Unable to refresh Upwork OAuth token (HTTP ${response.status}).`);
+  if (!response.ok)
+    throw new Error(
+      `Unable to refresh Upwork OAuth token (HTTP ${response.status}).`,
+    );
 
   const data = (await response.json()) as {
     access_token: string;
@@ -67,12 +77,16 @@ async function refresh(token: UpworkTokenFile) {
     expires_in?: number;
   };
 
-  return saveUpworkToken({ ...data, refresh_token: data.refresh_token ?? token.refreshToken });
+  return saveUpworkToken({
+    ...data,
+    refresh_token: data.refresh_token ?? token.refreshToken,
+  });
 }
 
 export async function getValidUpworkAccessToken() {
   let token = await readToken();
   if (!token) return undefined;
-  if (token.expiresAt - Date.now() < 5 * 60 * 1000) token = await refresh(token);
+  if (token.expiresAt - Date.now() < 5 * 60 * 1000)
+    token = await refresh(token);
   return token.accessToken;
 }

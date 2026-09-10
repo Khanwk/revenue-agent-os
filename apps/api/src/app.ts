@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
-import { env } from "./config/env.js";
-import { agentsRouter } from "./routes/agents.js";
-import { runsRouter } from "./routes/runs.js";
-import { profileRouter } from "./routes/profile.js";
-import { sourcesRouter } from "./routes/sources.js";
-import { healthRouter } from "./routes/health.js";
-import { upworkIntegrationRouter } from "./routes/upwork-integration.js";
+import { env } from "./config/env";
+import { agentsRouter } from "./routes/agents";
+import { runsRouter } from "./routes/runs";
+import { profileRouter } from "./routes/profile";
+import { sourcesRouter } from "./routes/sources";
+import { healthRouter } from "./routes/health";
+import { upworkIntegrationRouter } from "./routes/upwork-integration";
 
 export function createApp() {
   const app = express();

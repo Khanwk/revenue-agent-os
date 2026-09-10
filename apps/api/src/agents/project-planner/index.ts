@@ -1,1 +1,1 @@
-export { projectPlannerAgent } from "./agent.js";
+export { projectPlannerAgent } from "./agent";
