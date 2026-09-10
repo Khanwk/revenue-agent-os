@@ -1,0 +1,12 @@
+export type AgentStatus="idle"|"queued"|"thinking"|"tool"|"validating"|"completed"|"failed";
+export interface AgentMeta{id:string;name:string;shortName:string;description:string;purpose:string;icon:string;version:string}
+export interface RunEvent{id:string;status:Exclude<AgentStatus,"idle">;label:string;message:string;detail?:string;createdAt:string}
+export interface AgentRun<T=unknown>{id:string;agentId:string;status:Exclude<AgentStatus,"idle">;input:unknown;output?:T;error?:string;events:RunEvent[];createdAt:string;updatedAt:string}
+export interface CompanySkill{name:string;strength:number}
+export interface CompanyProfile{companyName:string;positioning:string;teamSummary:string;skills:CompanySkill[];services:string[];preferredKeywords:string[];avoidKeywords:string[];minimumFixedBudgetUsd:number;minimumHourlyRateUsd:number;maxProjectWeeks:number;weeklyCapacityHours:number;preferredRegions:string[];portfolioHighlights:string[];proposalTone:string}
+export interface Opportunity{ id:string;sourceId:string;platform:"upwork"|"freelancer"|"demo"|"other";platformLabel:string;title:string;description:string;budget:string;budgetMinUsd?:number;budgetMaxUsd?:number;hourlyMinUsd?:number;hourlyMaxUsd?:number;skills:string[];clientInfo:string;url?:string;postedAt?:string;location?:string;proposals?:string;proposalCount?:number;projectType?:"fixed"|"hourly"|"unknown";isDemo?:boolean }
+export interface RankedOpportunity{opportunity:Opportunity;quickScore:number;aiScore:number;finalScore:number;recommendation:"bid"|"consider"|"skip";confidence:number;summary:string;clientNeed:string;matchedSkills:string[];reasons:string[];risks:string[];suggestedBid:string;proposalAngle:string}
+export interface SourceStatus{id:string;label:string;platform:string;configured:boolean;note?:string}
+export interface EngineOutput{searchedQueries:string[];scannedCount:number;sourceErrors:string[];sources:SourceStatus[];ranked:RankedOpportunity[]}
+export interface ProposalOutput{recommendedPrice:string;pricingReason:string;openingHook:string;fullProposal:string;questions:string[];milestones:Array<{title:string;duration:string;deliverable:string}>;avoidSaying:string[]}
+export interface PlannerOutput{objective:string;assumptions:string[];architecture:string[];estimatedTimeline:string;phases:Array<{name:string;duration:string;outcomes:string[]}>;teamAssignments:Array<{role:string;responsibilities:string[]}>;risks:string[];discoveryQuestions:string[];definitionOfDone:string[]}

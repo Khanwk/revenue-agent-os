@@ -1,0 +1,16 @@
+{
+  "name": "revenue-agent-os",
+  "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n API,WEB -c auto \"npm run dev -w @revenue-agent/api\" \"npm run dev -w @revenue-agent/web\"",
+    "build": "npm run build -w @revenue-agent/api && npm run build -w @revenue-agent/web",
+    "typecheck": "npm run typecheck -w @revenue-agent/api && npm run typecheck -w @revenue-agent/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

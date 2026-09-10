@@ -1,0 +1,37 @@
+{
+  "companyName": "Your Software Company",
+  "positioning": "Custom SaaS, ecommerce systems and AI-enabled business automation for growing companies.",
+  "teamSummary": "Founder leads architecture/backend and client delivery with UI/UX, marketing and frontend support.",
+  "skills": [
+    {"name":"Next.js","strength":5},
+    {"name":"React","strength":5},
+    {"name":"TypeScript","strength":5},
+    {"name":"Node.js","strength":5},
+    {"name":"Express","strength":4},
+    {"name":"MongoDB","strength":5},
+    {"name":"PostgreSQL","strength":4},
+    {"name":"Redis","strength":4},
+    {"name":"AWS","strength":4},
+    {"name":"E-commerce","strength":5},
+    {"name":"SaaS","strength":5},
+    {"name":"AI Integration","strength":4}
+  ],
+  "services": [
+    "Custom SaaS development",
+    "E-commerce and business operations systems",
+    "AI integrations and workflow automation"
+  ],
+  "preferredKeywords": ["SaaS","dashboard","ecommerce","automation","admin portal","API","Next.js","Node.js","AI integration"],
+  "avoidKeywords": ["data entry","captcha","academic assignment","unpaid test"],
+  "minimumFixedBudgetUsd": 500,
+  "minimumHourlyRateUsd": 15,
+  "maxProjectWeeks": 10,
+  "weeklyCapacityHours": 35,
+  "preferredRegions": ["United States","United Kingdom","Canada","Australia","Europe","UAE"],
+  "portfolioHighlights": [
+    "Custom ecommerce workflows with customer/admin portals and quotation flows",
+    "Node/Express APIs with MongoDB, Redis and third-party integrations",
+    "Automated report/PDF generation workflows using AWS and browser rendering"
+  ],
+  "proposalTone": "Direct, professional, technically confident, concise, no fake claims"
+}
