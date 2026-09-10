@@ -1,9 +1,9 @@
-import { env } from "../config/env";
+import { env } from "../config/env.js ";
 import {
   getValidUpworkAccessToken,
   hasStoredUpworkToken,
-} from "../integrations/upwork-token-store";
-import type { DiscoveredOpportunity, OpportunitySource } from "./types";
+} from "../integrations/upwork-token-store.js ";
+import type { DiscoveredOpportunity, OpportunitySource } from "./types.js ";
 
 type GqlResponse = { data?: any; errors?: Array<{ message?: string }> };
 
@@ -31,7 +31,7 @@ async function gql(query: string, variables: Record<string, unknown>) {
       `Upwork API: ${json.errors
         .map((e) => e.message)
         .filter(Boolean)
-        .join("; ")}`,
+        .join(.js "; ")}`,
     );
   return json.data;
 }

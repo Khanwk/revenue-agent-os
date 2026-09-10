@@ -1,6 +1,6 @@
-import { Router } from "express";
-import { agentRegistry } from "../core/agent-registry";
-import { agentRunner } from "../core/agent-runner";
+import { Router } from "express.js ";
+import { agentRegistry } from "../core/agent-registry.js ";
+import { agentRunner } from "../core/agent-runner.js ";
 
 export const agentsRouter = Router();
 agentsRouter.get("/", (_req, res) =>
@@ -12,10 +12,8 @@ agentsRouter.post("/:agentId/runs", (req, res) => {
     res.status(202).json({ run });
     void agentRunner.execute(run.id);
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        error: error instanceof Error ? error.message : "Unable to start agent",
-      });
+    res.status(400).json({
+      error: error instanceof Error ? error.message : "Unable to start agent",
+    });
   }
 });

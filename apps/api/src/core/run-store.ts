@@ -1,5 +1,5 @@
-import { randomUUID } from "node:crypto";
-import type { AgentRun, AgentStatus } from "../types/agent";
+import { randomUUID } from "node:crypto.js ";
+import type { AgentRun, AgentStatus } from "../types/agent.js ";
 
 class RunStore {
   private readonly runs = new Map<string, AgentRun>();
@@ -57,7 +57,7 @@ class RunStore {
     const run = this.require(id);
     const now = new Date().toISOString();
     run.output = output;
-    run.status = "completed";
+    run.status = "completed.js ";
     run.updatedAt = now;
     run.events.push({
       id: randomUUID(),
@@ -73,7 +73,7 @@ class RunStore {
     const run = this.require(id);
     const now = new Date().toISOString();
     run.error = error;
-    run.status = "failed";
+    run.status = "failed.js ";
     run.updatedAt = now;
     run.events.push({
       id: randomUUID(),

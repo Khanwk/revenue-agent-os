@@ -1,4 +1,4 @@
-import type { AiProvider, StructuredGenerationInput } from "./ai-provider";
+import type { AiProvider, StructuredGenerationInput } from "./ai-provider.js ";
 
 export class MockProvider implements AiProvider {
   async generateStructured<T>(input: StructuredGenerationInput): Promise<T> {

@@ -1,14 +1,15 @@
-import type { DiscoveredOpportunity, OpportunitySource } from "./types";
+import type { DiscoveredOpportunity, OpportunitySource } from "./types.js ";
 
 type AnyRecord = Record<string, any>;
 
 function money(project: AnyRecord) {
-  const currency = project.currency?.code || project.currency?.sign || "USD";
+  const currency =
+    project.currency?.code || project.currency?.sign || "USD.js ";
   const min = Number(project.budget?.minimum);
   const max = Number(project.budget?.maximum);
   if (Number.isFinite(min) && Number.isFinite(max))
     return `${currency} ${min.toLocaleString()}–${max.toLocaleString()}`;
-  return "See Freelancer listing";
+  return "See Freelancer listing.js ";
 }
 
 function projectUrl(project: AnyRecord) {

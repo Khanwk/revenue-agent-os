@@ -1,4 +1,4 @@
-import type { AgentDefinition } from "../types/agent";
+import type { AgentDefinition } from "../types/agent.js ";
 
 class AgentRegistry {
   private readonly agents = new Map<string, AgentDefinition<any, any>>();

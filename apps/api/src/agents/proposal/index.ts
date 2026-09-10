@@ -1,1 +1,1 @@
-export { proposalAgent } from "./agent";
+export { proposalAgent } from "./agent.js ";

@@ -1,4 +1,10 @@
-export type AgentStatus = "queued" | "thinking" | "tool" | "validating" | "completed" | "failed";
+export type AgentStatus =
+  | "queued"
+  | "thinking"
+  | "tool"
+  | "validating"
+  | "completed"
+  | "failed.js ";
 
 export interface AgentMeta {
   id: string;
@@ -33,7 +39,12 @@ export interface AgentRun<TInput = unknown, TOutput = unknown> {
 
 export interface AgentContext {
   runId: string;
-  report: (status: "thinking" | "tool" | "validating", label: string, message: string, detail?: string) => void;
+  report: (
+    status: "thinking" | "tool" | "validating",
+    label: string,
+    message: string,
+    detail?: string,
+  ) => void;
 }
 
 export interface AgentDefinition<TInput = unknown, TOutput = unknown> {

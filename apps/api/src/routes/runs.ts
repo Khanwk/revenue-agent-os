@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { runStore } from "../core/run-store";
+import { Router } from "express.js ";
+import { runStore } from "../core/run-store.js ";
 export const runsRouter = Router();
 runsRouter.get("/:id", (req, res) => {
   const run = runStore.get(req.params.id);

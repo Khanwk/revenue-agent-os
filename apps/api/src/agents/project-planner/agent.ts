@@ -1,14 +1,14 @@
-import type { AgentDefinition } from "../../types/agent";
-import { getCompanyProfile } from "../../profile/profile-store";
-import { getAiProvider } from "../../providers/index";
-import { buildPlannerPrompt, PLANNER_SYSTEM_PROMPT } from "./prompt";
+import type { AgentDefinition } from "../../types/agent.js ";
+import { getCompanyProfile } from "../../profile/profile-store.js ";
+import { getAiProvider } from "../../providers/index.js ";
+import { buildPlannerPrompt, PLANNER_SYSTEM_PROMPT } from "./prompt.js ";
 import {
   plannerInputSchema,
   plannerJsonSchema,
   plannerOutputSchema,
   type PlannerInput,
   type PlannerOutput,
-} from "./schema";
+} from "./schema.js ";
 
 export const projectPlannerAgent: AgentDefinition<PlannerInput, PlannerOutput> =
   {

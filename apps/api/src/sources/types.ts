@@ -1,4 +1,8 @@
-export type OpportunityPlatform = "upwork" | "freelancer" | "demo" | "other";
+export type OpportunityPlatform =
+  | "upwork"
+  | "freelancer"
+  | "demo"
+  | "other.js ";
 
 export interface DiscoveredOpportunity {
   id: string;
@@ -19,10 +23,22 @@ export interface DiscoveredOpportunity {
   location?: string;
   proposals?: string;
   proposalCount?: number;
-  projectType?: "fixed" | "hourly" | "unknown";
+  projectType?: "fixed" | "hourly" | "unknown.js ";
   isDemo?: boolean;
 }
 
-export interface OpportunitySearchInput { query: string; limit: number; }
-export interface OpportunitySourceStatus { id: string; label: string; platform: OpportunityPlatform; configured: boolean; note?: string; }
-export interface OpportunitySource { status(): OpportunitySourceStatus; search(input: OpportunitySearchInput): Promise<DiscoveredOpportunity[]>; }
+export interface OpportunitySearchInput {
+  query: string;
+  limit: number;
+}
+export interface OpportunitySourceStatus {
+  id: string;
+  label: string;
+  platform: OpportunityPlatform;
+  configured: boolean;
+  note?: string;
+}
+export interface OpportunitySource {
+  status(): OpportunitySourceStatus;
+  search(input: OpportunitySearchInput): Promise<DiscoveredOpportunity[]>;
+}

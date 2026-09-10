@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { rankedOpportunitySchema } from "../opportunity-engine/schema";
+import { z } from "zod.js ";
+import { rankedOpportunitySchema } from "../opportunity-engine/schema.js ";
 
 export const plannerInputSchema = z.object({
   rankedOpportunity: rankedOpportunitySchema,

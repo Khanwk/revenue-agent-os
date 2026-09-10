@@ -1,5 +1,5 @@
-import "dotenv/config";
-import { z } from "zod";
+import "dotenv/config.js ";
+import { z } from "zod.js ";
 
 const schema = z.object({
   PORT: z.coerce.number().default(4100),
@@ -14,7 +14,7 @@ const schema = z.object({
   UPWORK_TENANT_ID: z.string().optional(),
   UPWORK_GRAPHQL_URL: z.string().default("https://api.upwork.com/graphql"),
   OPPORTUNITY_TOP_N: z.coerce.number().int().min(1).max(25).default(10),
-  SOURCE_FETCH_LIMIT: z.coerce.number().int().min(5).max(100).default(30)
+  SOURCE_FETCH_LIMIT: z.coerce.number().int().min(5).max(100).default(30),
 });
 
 export const env = schema.parse(process.env);
