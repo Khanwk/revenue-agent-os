@@ -1,7 +1,7 @@
-import { existsSync, promises as fs } from "node:fs.js ";
-import path from "node:path.js ";
-import { fileURLToPath } from "node:url.js ";
-import { env } from "../config/env.js ";
+import { existsSync, promises as fs } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { env } from "../config/env.js";
 
 interface UpworkTokenFile {
   accessToken: string;

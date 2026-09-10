@@ -1,17 +1,17 @@
-import { env } from "../../config/env.js ";
-import { getAiProvider } from "../../providers/index.js ";
-import { getCompanyProfile } from "../../profile/profile-store.js ";
-import { quickScore } from "../../ranking/quick-score.js ";
-import { searchAllSources } from "../../sources/index.js ";
-import type { AgentDefinition } from "../../types/agent.js ";
-import { buildEnginePrompt, ENGINE_SYSTEM_PROMPT } from "./prompt.js ";
+import { env } from "../../config/env.js";
+import { getAiProvider } from "../../providers/index.js";
+import { getCompanyProfile } from "../../profile/profile-store.js";
+import { quickScore } from "../../ranking/quick-score.js";
+import { searchAllSources } from "../../sources/index.js";
+import type { AgentDefinition } from "../../types/agent.js";
+import { buildEnginePrompt, ENGINE_SYSTEM_PROMPT } from "./prompt.js";
 import {
   engineInputSchema,
   engineOutputSchema,
   evaluationJsonSchema,
   type EngineInput,
   type EngineOutput,
-} from "./schema.js ";
+} from "./schema.js";
 
 function buildQueries(
   input: EngineInput,
@@ -96,7 +96,7 @@ export const opportunityEngineAgent: AgentDefinition<
           Math.min(96, quick.score + (index < 3 ? 5 - index * 2 : -2)),
         );
         const recommendation =
-          aiScore >= 74 ? "bid" : aiScore >= 58 ? "consider" : "skip.js ";
+          aiScore >= 74 ? "bid" : aiScore >= 58 ? "consider" : "skip.js";
         return {
           projectId: job.id,
           fitScore: aiScore,

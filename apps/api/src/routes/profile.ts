@@ -1,8 +1,8 @@
-import { Router } from "express.js ";
+import { Router } from "express";
 import {
   getCompanyProfile,
   saveCompanyProfile,
-} from "../profile/profile-store.js ";
+} from "../profile/profile-store.js";
 export const profileRouter = Router();
 profileRouter.get("/", async (_req, res, next) => {
   try {

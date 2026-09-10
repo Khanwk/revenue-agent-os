@@ -1,6 +1,6 @@
-import { agentRegistry } from "./agent-registry.js ";
-import { runStore } from "./run-store.js ";
-import { publishRun } from "./events.js ";
+import { agentRegistry } from "./agent-registry.js";
+import { runStore } from "./run-store.js";
+import { publishRun } from "./events.js";
 
 class AgentRunner {
   createRun(agentId: string, rawInput: unknown) {
@@ -23,7 +23,7 @@ class AgentRunner {
       publishRun(runStore.complete(runId, output));
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Unknown agent failure.js ";
+        error instanceof Error ? error.message : "Unknown agent failure.js";
       publishRun(runStore.fail(runId, message));
     }
   }

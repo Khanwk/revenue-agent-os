@@ -1,5 +1,5 @@
-import "dotenv/config.js ";
-import { z } from "zod.js ";
+import "dotenv/config.js";
+import { z } from "zod";
 
 const schema = z.object({
   PORT: z.coerce.number().default(4100),

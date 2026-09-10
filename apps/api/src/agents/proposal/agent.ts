@@ -1,14 +1,14 @@
-import type { AgentDefinition } from "../../types/agent.js ";
-import { getCompanyProfile } from "../../profile/profile-store.js ";
-import { getAiProvider } from "../../providers/index.js ";
-import { buildProposalPrompt, PROPOSAL_SYSTEM_PROMPT } from "./prompt.js ";
+import type { AgentDefinition } from "../../types/agent.js";
+import { getCompanyProfile } from "../../profile/profile-store.js";
+import { getAiProvider } from "../../providers/index.js";
+import { buildProposalPrompt, PROPOSAL_SYSTEM_PROMPT } from "./prompt.js";
 import {
   proposalInputSchema,
   proposalJsonSchema,
   proposalOutputSchema,
   type ProposalInput,
   type ProposalOutput,
-} from "./schema.js ";
+} from "./schema.js";
 
 export const proposalAgent: AgentDefinition<ProposalInput, ProposalOutput> = {
   meta: {

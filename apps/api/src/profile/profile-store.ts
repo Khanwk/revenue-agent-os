@@ -1,8 +1,8 @@
-import { promises as fs } from "node:fs.js ";
-import path from "node:path.js ";
-import { fileURLToPath } from "node:url.js ";
-import { z } from "zod.js ";
-import type { CompanyProfile } from "../types/company.js ";
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { z } from "zod";
+import type { CompanyProfile } from "../types/company.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const filePath = path.resolve(__dirname, "../../data/company-profile.json");

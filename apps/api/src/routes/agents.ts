@@ -1,6 +1,6 @@
-import { Router } from "express.js ";
-import { agentRegistry } from "../core/agent-registry.js ";
-import { agentRunner } from "../core/agent-runner.js ";
+import { Router } from "express";
+import { agentRegistry } from "../core/agent-registry.js";
+import { agentRunner } from "../core/agent-runner.js";
 
 export const agentsRouter = Router();
 agentsRouter.get("/", (_req, res) =>

@@ -1,4 +1,4 @@
-import type { OpportunitySource } from "./types.js ";
+import type { OpportunitySource } from "./types.js";
 
 const demo = [
   {

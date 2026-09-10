@@ -1,5 +1,5 @@
-import type { CompanyProfile } from "../types/company.js ";
-import type { DiscoveredOpportunity } from "../sources/types.js ";
+import type { CompanyProfile } from "../types/company.js";
+import type { DiscoveredOpportunity } from "../sources/types.js";
 
 export interface QuickScoreResult {
   score: number;

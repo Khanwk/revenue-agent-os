@@ -4,7 +4,7 @@ export type AgentStatus =
   | "tool"
   | "validating"
   | "completed"
-  | "failed.js ";
+  | "failed";
 
 export interface AgentMeta {
   id: string;

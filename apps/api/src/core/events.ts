@@ -1,5 +1,5 @@
-import type { Server } from "socket.io.js ";
-import type { AgentRun } from "../types/agent.js ";
+import type { Server } from "socket.io";
+import type { AgentRun } from "../types/agent.js";
 
 let io: Server | undefined;
 export function bindSocketServer(server: Server) {

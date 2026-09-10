@@ -1,6 +1,6 @@
-import { GoogleGenAI } from "@google/genai.js ";
-import { env } from "../config/env.js ";
-import type { AiProvider, StructuredGenerationInput } from "./ai-provider.js ";
+import { GoogleGenAI } from "@google/genai";
+import { env } from "../config/env.js";
+import type { AiProvider, StructuredGenerationInput } from "./ai-provider.js";
 
 export class GeminiProvider implements AiProvider {
   private readonly client: GoogleGenAI;

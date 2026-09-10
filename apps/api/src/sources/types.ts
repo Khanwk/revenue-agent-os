@@ -1,8 +1,4 @@
-export type OpportunityPlatform =
-  | "upwork"
-  | "freelancer"
-  | "demo"
-  | "other.js ";
+export type OpportunityPlatform = "upwork" | "freelancer" | "demo" | "other.js";
 
 export interface DiscoveredOpportunity {
   id: string;
@@ -23,7 +19,7 @@ export interface DiscoveredOpportunity {
   location?: string;
   proposals?: string;
   proposalCount?: number;
-  projectType?: "fixed" | "hourly" | "unknown.js ";
+  projectType?: "fixed" | "hourly" | "unknown";
   isDemo?: boolean;
 }
 

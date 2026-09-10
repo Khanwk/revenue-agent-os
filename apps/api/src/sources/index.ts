@@ -1,11 +1,11 @@
-import { demoOpportunitySource } from "./demo-source.js ";
-import { freelancerOpportunitySource } from "./freelancer-source.js ";
-import { upworkOpportunitySource } from "./upwork-source.js ";
+import { demoOpportunitySource } from "./demo-source.js";
+import { freelancerOpportunitySource } from "./freelancer-source.js";
+import { upworkOpportunitySource } from "./upwork-source.js";
 import type {
   DiscoveredOpportunity,
   OpportunitySearchInput,
   OpportunitySourceStatus,
-} from "./types.js ";
+} from "./types.js";
 
 const sources = [
   freelancerOpportunitySource,
@@ -51,4 +51,4 @@ export type {
   DiscoveredOpportunity,
   OpportunityPlatform,
   OpportunitySourceStatus,
-} from "./types.js ";
+} from "./types.js";

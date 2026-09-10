@@ -1,4 +1,4 @@
-import { z } from "zod.js ";
+import { z } from "zod";
 
 export const engineInputSchema = z.object({
   query: z.string().optional().default(""),

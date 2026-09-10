@@ -1,56 +1,101 @@
-import { env } from "../config/env.js ";
+import { env } from "../config/env.js";
 import {
   getValidUpworkAccessToken,
   hasStoredUpworkToken,
-} from "../integrations/upwork-token-store.js ";
-import type { DiscoveredOpportunity, OpportunitySource } from "./types.js ";
+} from "../integrations/upwork-token-store.js";
+import type { DiscoveredOpportunity, OpportunitySource } from "./types.js";
 
-type GqlResponse = { data?: any; errors?: Array<{ message?: string }> };
+type GqlResponse = {
+  data?: any;
+  errors?: Array<{
+    message?: string;
+  }>;
+};
 
 async function gql(query: string, variables: Record<string, unknown>) {
   const accessToken = await getValidUpworkAccessToken();
-  if (!accessToken) throw new Error("Upwork is not connected.");
+
+  if (!accessToken) {
+    throw new Error("Upwork is not connected.");
+  }
+
   const headers: Record<string, string> = {
     Authorization: `Bearer ${accessToken}`,
     "Content-Type": "application/json",
     Accept: "application/json",
   };
-  if (env.UPWORK_TENANT_ID)
+
+  if (env.UPWORK_TENANT_ID) {
     headers["X-Upwork-API-TenantId"] = env.UPWORK_TENANT_ID;
+  }
+
   const response = await fetch(env.UPWORK_GRAPHQL_URL, {
     method: "POST",
     headers,
-    body: JSON.stringify({ query, variables }),
+    body: JSON.stringify({
+      query,
+      variables,
+    }),
     signal: AbortSignal.timeout(15000),
   });
-  if (!response.ok)
+
+  if (!response.ok) {
     throw new Error(`Upwork API returned HTTP ${response.status}`);
+  }
+
   const json = (await response.json()) as GqlResponse;
-  if (json.errors?.length)
+
+  if (json.errors?.length) {
     throw new Error(
       `Upwork API: ${json.errors
-        .map((e) => e.message)
+        .map((error) => error.message)
         .filter(Boolean)
-        .join(.js "; ")}`,
+        .join("; ")}`,
     );
+  }
+
   return json.data;
 }
 
 const SEARCH_QUERY = `
-query SearchJobs($filter: MarketplaceJobPostingsSearchFilter, $searchType: MarketplaceJobPostingSearchType, $sortAttributes: [MarketplaceJobPostingSearchSortAttribute]) {
-  marketplaceJobPostingsSearch(marketPlaceJobFilter: $filter, searchType: $searchType, sortAttributes: $sortAttributes) {
-    totalCount
-    edges { node { id title description category } }
-    pageInfo { hasNextPage endCursor }
+  query SearchJobs(
+    $filter: MarketplaceJobPostingsSearchFilter
+    $searchType: MarketplaceJobPostingSearchType
+    $sortAttributes: [MarketplaceJobPostingSearchSortAttribute]
+  ) {
+    marketplaceJobPostingsSearch(
+      marketPlaceJobFilter: $filter
+      searchType: $searchType
+      sortAttributes: $sortAttributes
+    ) {
+      totalCount
+      edges {
+        node {
+          id
+          title
+          description
+          category
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
   }
-}`;
+`;
 
 const CONTENT_QUERY = `
-query JobContents($ids: [ID!]!) {
-  marketplaceJobPostingsContents(ids: $ids) {
-    id ciphertext title description publishedDateTime
+  query JobContents($ids: [ID!]!) {
+    marketplaceJobPostingsContents(ids: $ids) {
+      id
+      ciphertext
+      title
+      description
+      publishedDateTime
+    }
   }
-}`;
+`;
 
 export const upworkOpportunitySource: OpportunitySource = {
   status: () => ({
@@ -62,46 +107,76 @@ export const upworkOpportunitySource: OpportunitySource = {
       ? "Official Upwork GraphQL API connected."
       : "Connect an approved Upwork OAuth app with marketplace job-read scope.",
   }),
+
   async search(input) {
-    if (!hasStoredUpworkToken()) return [];
+    if (!hasStoredUpworkToken()) {
+      return [];
+    }
+
     const data = await gql(SEARCH_QUERY, {
-      filter: { titleExpression_eq: input.query },
+      filter: {
+        titleExpression_eq: input.query,
+      },
       searchType: "USER_JOBS_SEARCH",
-      sortAttributes: [{ field: "RECENCY" }],
+      sortAttributes: [
+        {
+          field: "RECENCY",
+        },
+      ],
     });
+
     const nodes = (data?.marketplaceJobPostingsSearch?.edges ?? [])
       .map((edge: any) => edge?.node)
       .filter(Boolean)
       .slice(0, input.limit);
-    if (!nodes.length) return [];
+
+    if (!nodes.length) {
+      return [];
+    }
+
     const contentsData = await gql(CONTENT_QUERY, {
       ids: nodes.map((node: any) => String(node.id)),
     });
+
     const contents = new Map(
       (contentsData?.marketplaceJobPostingsContents ?? []).map((item: any) => [
         String(item.id),
         item,
       ]),
     );
+
     return nodes.map((node: any): DiscoveredOpportunity => {
       const content: any = contents.get(String(node.id));
+
       const ciphertext = String(content?.ciphertext || "");
+
       return {
         id: `upwork:${node.id}`,
         sourceId: String(node.id),
+
         platform: "upwork",
         platformLabel: "Upwork",
+
         title: String(content?.title || node.title || "Untitled Upwork job"),
+
         description: String(content?.description || node.description || ""),
+
         budget: "See Upwork listing",
+
         skills: [],
+
         clientInfo: "See Upwork client details",
+
         url: ciphertext
-          ? `https://www.upwork.com/jobs/${ciphertext.startsWith("~") ? ciphertext : `~${ciphertext}`}`
+          ? `https://www.upwork.com/jobs/${
+              ciphertext.startsWith("~") ? ciphertext : `~${ciphertext}`
+            }`
           : undefined,
+
         postedAt: content?.publishedDateTime
           ? String(content.publishedDateTime)
           : undefined,
+
         projectType: "unknown",
       };
     });

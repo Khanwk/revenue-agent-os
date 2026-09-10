@@ -1,10 +1,10 @@
-import { randomUUID } from "node:crypto.js ";
-import { Router } from "express.js ";
-import { env } from "../config/env.js ";
+import { randomUUID } from "node:crypto";
+import { Router } from "express";
+import { env } from "../config/env.js";
 import {
   hasStoredUpworkToken,
   saveUpworkToken,
-} from "../integrations/upwork-token-store.js ";
+} from "../integrations/upwork-token-store.js";
 
 export const upworkIntegrationRouter = Router();
 const states = new Map<string, number>();
@@ -44,9 +44,8 @@ upworkIntegrationRouter.get("/connect", (_req, res) => {
 
 upworkIntegrationRouter.get("/callback", async (req, res) => {
   try {
-    const code = typeof req.query.code === "string" ? req.query.code : ".js ";
-    const state =
-      typeof req.query.state === "string" ? req.query.state : ".js ";
+    const code = typeof req.query.code === "string" ? req.query.code : ".js";
+    const state = typeof req.query.state === "string" ? req.query.state : ".js";
     const validUntil = states.get(state);
     states.delete(state);
 
