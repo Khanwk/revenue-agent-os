@@ -8,18 +8,64 @@ import { sourcesRouter } from "./routes/sources.js";
 import { healthRouter } from "./routes/health.js";
 import { upworkIntegrationRouter } from "./routes/upwork-integration.js";
 
-export function createApp(){
-  const app=express();
-  app.use(cors({origin:env.WEB_ORIGIN}));
-  app.use(express.json({limit:"2mb"}));
-  app.use("/api/health",healthRouter);
-  app.use("/api/integrations/upwork",upworkIntegrationRouter);
-  app.use("/api/profile",profileRouter);
-  app.use("/api/sources",sourcesRouter);
-  app.use("/api/agents",agentsRouter);
-  app.use("/api/runs",runsRouter);
-  app.use((error:unknown,_req:express.Request,res:express.Response,_next:express.NextFunction)=>{
-    console.error(error);res.status(500).json({error:error instanceof Error?error.message:"Internal server error"});
+export function createApp() {
+  const app = express();
+
+  app.use(
+    cors({
+      origin: env.WEB_ORIGIN,
+      credentials: true,
+    }),
+  );
+
+  app.use(express.json({ limit: "2mb" }));
+  app.use(express.urlencoded({ extended: true }));
+
+  app.get("/", (_req, res) => {
+    res.status(200).json({
+      success: true,
+      service: "Revenue Agent OS API",
+      status: "running",
+      endpoints: {
+        health: "/api/health",
+        agents: "/api/agents",
+        runs: "/api/runs",
+        profile: "/api/profile",
+        sources: "/api/sources",
+        upwork: "/api/integrations/upwork",
+      },
+    });
   });
+
+  app.use("/api/health", healthRouter);
+  app.use("/api/integrations/upwork", upworkIntegrationRouter);
+  app.use("/api/profile", profileRouter);
+  app.use("/api/sources", sourcesRouter);
+  app.use("/api/agents", agentsRouter);
+  app.use("/api/runs", runsRouter);
+
+  app.use((_req, res) => {
+    res.status(404).json({
+      success: false,
+      error: "Route not found",
+    });
+  });
+
+  app.use(
+    (
+      error: unknown,
+      _req: express.Request,
+      res: express.Response,
+      _next: express.NextFunction,
+    ) => {
+      console.error("[API ERROR]", error);
+
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
+    },
+  );
+
   return app;
 }
