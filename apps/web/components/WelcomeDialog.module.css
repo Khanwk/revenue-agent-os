@@ -335,3 +335,14 @@
   .footer { grid-template-columns: 1fr; }
   .secondary { order: 2; }
 }
+
+/* v2.8 readability + phone/tablet responsiveness */
+.brandCopy p{font-size:12px;line-height:1.75}.capability span{font-size:10px}.capability p{font-size:9.5px;line-height:1.5}
+.controlNote strong{font-size:10px}.controlNote p{font-size:9.5px;line-height:1.55}
+.topRow h3{font-size:24px}.quotaPill{font-size:9.5px}.quotaPill strong{font-size:11px}
+.stepBody strong{font-size:12px}.stepBody p{font-size:10.5px;line-height:1.6}.stepMeta{font-size:9px}
+.firstRunHeader strong{font-size:12px}.firstRunCard>p{font-size:10.5px;line-height:1.6}.promptPreview span{font-size:9px}.promptPreview code{font-size:10px;line-height:1.55}
+.helperText p{font-size:10px;line-height:1.55}.guideLink{font-size:10px}.secondary,.primary{font-size:11px;min-height:44px}
+@media(max-width:900px){.backdrop{overflow-y:auto;align-items:start}.dialog{max-height:none;margin:auto}.shell{display:block}.brandPanel{min-height:auto}.contentPanel{padding:26px}.capabilityList{grid-template-columns:repeat(2,minmax(0,1fr))}.footer{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(9,15,21,.85),#090f15 30%);padding-bottom:2px}}
+@media(max-width:680px){.backdrop{padding:0}.dialog{width:100%;min-height:100dvh;max-height:none;border:0;border-radius:0}.close{position:fixed;top:12px;right:12px}.brandPanel{padding:22px 18px 18px}.brandCopy{margin-top:26px}.brandCopy h2{font-size:26px}.capabilityList{grid-template-columns:1fr}.contentPanel{padding:22px 16px 18px}.topRow{padding-right:44px;flex-direction:column;gap:12px}.steps{margin-top:18px}.stepCard{grid-template-columns:36px 1fr;padding:13px}.stepNumber{width:36px;height:36px}.firstRunHeader{flex-direction:column}.promptPreview{grid-template-columns:1fr}.helperRow{align-items:flex-start;flex-direction:column}.footer{gap:8px}.secondary,.primary{flex:1;padding:0 12px}.primary{min-width:0}}
+@media(max-width:420px){.brandTop{padding-right:48px}.privateBadge{display:none}.brandCopy h2{font-size:23px}.footer{flex-direction:column-reverse}.secondary,.primary{width:100%}}
