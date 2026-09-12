@@ -11,6 +11,8 @@
     "typecheck": "npm run typecheck -w @revenue-agent/api && npm run typecheck -w @revenue-agent/web"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "dotenv": "^8.2.0",
+    "node-fetch": "^3.3.2"
   }
 }

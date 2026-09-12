@@ -265,3 +265,20 @@
 .resultHead{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-top:4px;padding:4px 2px}.resultHead h3{font-size:17px;margin:5px 0 0}.resultHead small{font-size:9px;color:#637582}
 @media(max-width:900px){.guideGrid{grid-template-columns:1fr}.outputList{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:680px){.header{padding:20px;flex-direction:column}.agentBadge{align-self:flex-start}.guideGrid{padding:14px 20px 0}.formWrap{margin:14px 20px 20px}.formTop{flex-direction:column}.demoButton{width:100%!important}.outputList{grid-template-columns:1fr}.actions{align-items:stretch;flex-direction:column-reverse}.guideLink,.runButton{width:100%}.empty{justify-content:flex-start}}
+
+/* v2.8 readability + responsive polish */
+.header h2{font-size:clamp(22px,2vw,30px);line-height:1.18}
+.header p{font-size:13px;line-height:1.7;color:#a1b0ba}
+.agentBadge{font-size:10px}
+.guideCard strong{font-size:13px}.guideCard p{font-size:12px;line-height:1.7;color:#a4b3bd}
+.checklist span,.outputList span{font-size:11px;line-height:1.4;min-height:32px}
+.formTop label{font-size:12px}.formTop p{font-size:11px;line-height:1.55}
+.demoButton,.guideLink,.runButton{font-size:12px;min-height:42px}
+.textarea{font-size:14px;line-height:1.75;min-height:260px}
+.textarea::placeholder{font-size:14px;line-height:1.75;color:#61727f}
+.meta{font-size:10px}
+.empty h3{font-size:17px}.empty p{font-size:12px;line-height:1.65}
+.resultHead h3{font-size:19px}.resultHead small{font-size:10px}
+@media(max-width:900px){.shell{border-radius:16px}.header{padding:22px}.guideGrid{gap:10px}.formWrap{margin-left:22px;margin-right:22px}}
+@media(max-width:680px){.header{padding:18px}.header h2{font-size:22px}.guideGrid{padding:12px 14px 0}.formWrap{margin:12px 14px 16px;padding:14px}.textarea{min-height:220px;font-size:14px;padding:14px 14px 44px}.guideCard{padding:14px}.meta{gap:8px;flex-wrap:wrap}.actions{gap:8px}.empty{padding:20px}}
+@media(max-width:420px){.header h2{font-size:20px}.header p{font-size:12px}.checklist span,.outputList span{font-size:10.5px}.textarea{min-height:200px}}
