@@ -6,11 +6,13 @@
     "apps/web"
   ],
   "scripts": {
-    "dev": "concurrently -n API,WEB -c auto \"npm run dev -w @revenue-agent/api\" \"npm run dev -w @revenue-agent/web\"",
+    "dev": "node api.js && concurrently -n API,WEB -c auto \"npm run dev -w @revenue-agent/api\" \"npm run dev -w @revenue-agent/web\"",
     "build": "npm run build -w @revenue-agent/api && npm run build -w @revenue-agent/web",
     "typecheck": "npm run typecheck -w @revenue-agent/api && npm run typecheck -w @revenue-agent/web"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "dotenv": "^8.2.0",
+    "node-fetch": "^3.3.2"
   }
 }
