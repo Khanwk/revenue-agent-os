@@ -1,92 +1,12 @@
-import { existsSync, promises as fs } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { env } from "../config/env.js";
-
-interface UpworkTokenFile {
-  accessToken: string;
-  refreshToken?: string;
-  expiresAt: number;
-}
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const tokenPath = path.resolve(__dirname, "../../data/upwork-token.json");
-
-export function hasStoredUpworkToken() {
-  return Boolean(env.UPWORK_ACCESS_TOKEN) || existsSync(tokenPath);
-}
-
-async function readToken(): Promise<UpworkTokenFile | undefined> {
-  if (env.UPWORK_ACCESS_TOKEN) {
-    return {
-      accessToken: env.UPWORK_ACCESS_TOKEN,
-      expiresAt: Number.MAX_SAFE_INTEGER,
-    };
-  }
-
-  try {
-    return JSON.parse(await fs.readFile(tokenPath, "utf8")) as UpworkTokenFile;
-  } catch {
-    return undefined;
-  }
-}
-
-export async function saveUpworkToken(payload: {
-  access_token: string;
-  refresh_token?: string;
-  expires_in?: number;
-}) {
-  const token: UpworkTokenFile = {
-    accessToken: payload.access_token,
-    refreshToken: payload.refresh_token,
-    expiresAt: Date.now() + Math.max(60, payload.expires_in ?? 86_400) * 1000,
-  };
-  await fs.writeFile(tokenPath, `${JSON.stringify(token, null, 2)}\n`, "utf8");
-  return token;
-}
-
-async function refresh(token: UpworkTokenFile) {
-  if (!token.refreshToken || !env.UPWORK_CLIENT_ID || !env.UPWORK_CLIENT_SECRET)
-    return token;
-
-  const body = new URLSearchParams({
-    grant_type: "refresh_token",
-    client_id: env.UPWORK_CLIENT_ID,
-    client_secret: env.UPWORK_CLIENT_SECRET,
-    refresh_token: token.refreshToken,
-  });
-
-  const response = await fetch("https://www.upwork.com/api/v3/oauth2/token", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body,
-    signal: AbortSignal.timeout(15_000),
-  });
-
-  if (!response.ok)
-    throw new Error(
-      `Unable to refresh Upwork OAuth token (HTTP ${response.status}).`,
-    );
-
-  const data = (await response.json()) as {
-    access_token: string;
-    refresh_token?: string;
-    expires_in?: number;
-  };
-
-  return saveUpworkToken({
-    ...data,
-    refresh_token: data.refresh_token ?? token.refreshToken,
-  });
-}
-
-export async function getValidUpworkAccessToken() {
-  let token = await readToken();
-  if (!token) return undefined;
-  if (token.expiresAt - Date.now() < 5 * 60 * 1000)
-    token = await refresh(token);
-  return token.accessToken;
-}
+import { supabaseAdmin } from "../db/supabase.js";
+interface UpworkToken { accessToken:string;refreshToken?:string;expiresAt:number; }
+function key(){if(!env.OAUTH_ENCRYPTION_KEY)throw new Error("OAUTH_ENCRYPTION_KEY is required for Upwork OAuth.");return createHash("sha256").update(env.OAUTH_ENCRYPTION_KEY).digest();}
+function encrypt(value:string){const iv=randomBytes(12);const cipher=createCipheriv("aes-256-gcm",key(),iv);const encrypted=Buffer.concat([cipher.update(value,"utf8"),cipher.final()]);const tag=cipher.getAuthTag();return Buffer.concat([iv,tag,encrypted]).toString("base64");}
+function decrypt(value:string){const raw=Buffer.from(value,"base64");const iv=raw.subarray(0,12),tag=raw.subarray(12,28),encrypted=raw.subarray(28);const decipher=createDecipheriv("aes-256-gcm",key(),iv);decipher.setAuthTag(tag);return Buffer.concat([decipher.update(encrypted),decipher.final()]).toString("utf8");}
+export async function hasStoredUpworkToken(userId:string){const{data,error}=await supabaseAdmin.from("oauth_connections").select("user_id").eq("user_id",userId).eq("provider","upwork").maybeSingle();if(error)throw error;return Boolean(data);}
+async function readToken(userId:string):Promise<UpworkToken|undefined>{const{data,error}=await supabaseAdmin.from("oauth_connections").select("token_ciphertext").eq("user_id",userId).eq("provider","upwork").maybeSingle();if(error)throw error;if(!data)return undefined;return JSON.parse(decrypt(data.token_ciphertext)) as UpworkToken;}
+export async function saveUpworkToken(userId:string,payload:{access_token:string;refresh_token?:string;expires_in?:number}){const token:UpworkToken={accessToken:payload.access_token,refreshToken:payload.refresh_token,expiresAt:Date.now()+Math.max(60,payload.expires_in??86400)*1000};const{error}=await supabaseAdmin.from("oauth_connections").upsert({user_id:userId,provider:"upwork",token_ciphertext:encrypt(JSON.stringify(token)),updated_at:new Date().toISOString()},{onConflict:"user_id,provider"});if(error)throw error;return token;}
+async function refresh(userId:string,token:UpworkToken){if(!token.refreshToken||!env.UPWORK_CLIENT_ID||!env.UPWORK_CLIENT_SECRET)return token;const body=new URLSearchParams({grant_type:"refresh_token",client_id:env.UPWORK_CLIENT_ID,client_secret:env.UPWORK_CLIENT_SECRET,refresh_token:token.refreshToken});const response=await fetch("https://www.upwork.com/api/v3/oauth2/token",{method:"POST",headers:{Accept:"application/json","Content-Type":"application/x-www-form-urlencoded"},body,signal:AbortSignal.timeout(15000)});if(!response.ok)throw new Error(`Unable to refresh Upwork OAuth token (HTTP ${response.status}).`);const data=await response.json() as {access_token:string;refresh_token?:string;expires_in?:number};return saveUpworkToken(userId,{...data,refresh_token:data.refresh_token??token.refreshToken});}
+export async function getValidUpworkAccessToken(userId:string){let token=await readToken(userId);if(!token)return undefined;if(token.expiresAt-Date.now()<300000)token=await refresh(userId,token);return token.accessToken;}

@@ -1,0 +1,14 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    env_file: apps/api/.env
+    ports: ["4100:4100"]
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    env_file: apps/web/.env.local
+    ports: ["3000:3000"]
+    depends_on: [api]

@@ -1,0 +1,21 @@
+# Private-beta production checklist
+
+- [ ] Run Supabase migration `apps/api/supabase/001_initial.sql`.
+- [ ] Enable email confirmation or explicitly choose your desired Supabase Auth policy.
+- [ ] Put `SUPABASE_SERVICE_ROLE_KEY` only on the API host.
+- [ ] Put only the Supabase anon key in `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- [ ] Set `WEB_ORIGIN` to exact deployed web origin(s), comma separated if needed.
+- [ ] Generate a strong `OAUTH_ENCRYPTION_KEY` before connecting Upwork.
+- [ ] Start with one API replica; add `REDIS_URL` before scaling to multiple replicas.
+- [ ] Keep `AI_PROVIDER=mock` while testing infrastructure; switch to Gemini only when ready.
+- [ ] Set `DEMO_SOURCE_ENABLED=false` when you want only real marketplace data.
+- [ ] Verify `/api/health` publicly, then verify authenticated `/api/me` from the web UI.
+- [ ] Create a test account and confirm quota shows 5/5.
+- [ ] Run Scout once and confirm quota becomes 4/5.
+- [ ] Confirm a second user has separate profile, runs and quota.
+- [ ] Confirm signing out blocks REST and Socket.IO.
+- [ ] Confirm browser Network tab shows Socket.IO connected to the API host.
+- [ ] Test socket reconnect by briefly stopping/restarting the API.
+- [ ] Confirm REST polling still completes a run if socket is offline.
+- [ ] Connect Upwork only after the above is stable.
+- [ ] Disable public signup in Supabase if demos are invite-only.

@@ -1,202 +1,158 @@
-# Revenue Agent OS
+# Revenue Agent OS v2.0
 
-Local-first agent workspace for a small software company that wants to find better freelance work, prepare stronger proposals and plan delivery without making the founder the bottleneck.
+Private-beta AI operating system for a small software company. It combines authenticated company context, opportunity discovery, sales agents, delivery agents, growth agents, live Socket.IO execution, persistent run history and a server-enforced demo quota.
 
 ## Agents included
 
-### 1. Scout — Opportunity Engine
+**Sales**: Scout (opportunity discovery/ranking), Pitch (proposal), Prospector (lead research), Reach (outreach), Discover (client discovery), Estimate (pricing/estimation).
 
-- Reads your company profile once: skills, strength, services, target budgets, preferred work and avoid-list.
-- Creates its own search queries when the search box is blank.
-- Searches every configured source.
-- Deterministically pre-scores every discovered project first (cheap).
-- Sends only the best candidates to AI for deeper fit analysis.
-- Produces a ranked TOP 10 with BID / CONSIDER / SKIP.
-- Every real project card includes **Open original ↗** to the source listing.
+**Delivery**: Architect (project plan), Spec (requirements/acceptance criteria), Guardian (QA/release).
 
-### 2. Pitch — Proposal Agent
+**Growth**: Growth (marketing), Expand (retention/upsell/referrals), Proof (case studies).
 
-- Receives the exact ranked opportunity from Scout.
-- Uses only real company-profile evidence.
-- Produces price direction, opening angle, full proposal draft, questions and milestones.
-- Never submits automatically.
+**Operations**: Ops (SOP/process), Advisor (company decisions).
 
-### 3. Architect — Project Planner
-
-- Receives the selected opportunity and Scout analysis.
-- Produces assumptions, architecture, phases, role allocation, risks, discovery questions and definition of done.
-
-## Sources included
-
-- **Freelancer.com**: live adapter using the official active-project API. No app code changes needed.
-- **Upwork**: official GraphQL API adapter. It is enabled only when `UPWORK_ACCESS_TOKEN` is configured.
-- **Demo Feed**: local examples so the complete UI works even with no external credentials/network.
-
-No Upwork scraping or automatic bidding is included.
-
-## Stack
+## Architecture
 
 ```text
-Next.js UI
-   ↓ REST + Socket.IO
-Node.js / Express Agent Runtime
-   ├── Agent Registry
-   ├── Run Engine
-   ├── Company Profile Store
-   ├── Opportunity Sources
-   ├── Fast deterministic ranking
-   └── AI Provider
-        ├── Mock (free/local testing)
-        └── Gemini
+Next.js web
+   | Supabase user session
+   | REST + Socket.IO
+   v
+Node/Express API
+   |-- authenticated agent runner
+   |-- Scout source adapters
+   |-- optional Redis socket adapter
+   |-- Gemini or mock AI provider
+   v
+Supabase
+   |-- Auth
+   |-- per-user company profiles
+   |-- per-user agent runs
+   |-- 5-scan demo quota
+   |-- encrypted Upwork OAuth connection records
 ```
 
-## Run on Windows
+The API does not depend on Railway. It can run on Railway, Render, Fly.io, AWS, DigitalOcean, a VPS, Docker, or any host that supports a persistent Node HTTP/WebSocket server.
 
-Requirements: Node.js 20.9+.
+## 1. Create Supabase project
 
-PowerShell:
+Create a Supabase project, then open SQL Editor and run:
 
-```powershell
-npm install
-Copy-Item apps/api/.env.example apps/api/.env
-Copy-Item apps/web/.env.local.example apps/web/.env.local
-npm run dev
+```text
+apps/api/supabase/001_initial.sql
 ```
 
-Open `http://localhost:3000`.
+Get:
+- Project URL
+- anon/public key (for the web app)
+- service-role key (API only; never expose it in `NEXT_PUBLIC_*`)
 
-The API runs at `http://localhost:4100`.
+For a closed private demo, you can disable open signup in Supabase after creating/inviting the tester accounts you want.
 
-## Start free
+## 2. Environment
 
-The default `.env.example` uses:
+API (`apps/api/.env`):
 
 ```env
+PORT=4100
+WEB_ORIGIN=http://localhost:3000
 AI_PROVIDER=mock
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
+OAUTH_ENCRYPTION_KEY=use-a-long-random-secret-at-least-32-characters
+DEMO_SCAN_LIMIT=5
+AGENT_RUNS_PER_HOUR=30
+DEMO_SOURCE_ENABLED=true
 ```
 
-Everything works without an AI API key. Freelancer live discovery needs internet; demo projects remain available if a source is unavailable.
-
-To use Gemini:
+Optional Gemini:
 
 ```env
 AI_PROVIDER=gemini
-GEMINI_API_KEY=your_key
+GEMINI_API_KEY=...
 GEMINI_MODEL=gemini-3.7-flash
 ```
 
-## Upwork setup
-
-Use the official Upwork developer API. Configure your approved OAuth app and then click **connect** beside Upwork in the Scout source strip.
+Optional Redis (needed only when horizontally scaling Socket.IO):
 
 ```env
-UPWORK_CLIENT_ID=your_client_id
-UPWORK_CLIENT_SECRET=your_client_secret
-UPWORK_REDIRECT_URI=http://localhost:4100/api/integrations/upwork/callback
-UPWORK_TENANT_ID=
+REDIS_URL=redis://...
 ```
 
-The API stores the OAuth token locally in `apps/api/data/upwork-token.json` (gitignored) and refreshes it when needed. `UPWORK_ACCESS_TOKEN` remains available as a manual fallback.
+Web (`apps/web/.env.local`):
 
-The adapter uses:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4100
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_ANON_KEY
+```
+
+## 3. Local run
+
+```bash
+npm install
+npm run dev
+```
+
+Web: http://localhost:3000  
+API: http://localhost:4100  
+Health: http://localhost:4100/api/health
+
+## 4. Demo quota
+
+Every Supabase user receives 5 Scout scans. The quota is consumed atomically in PostgreSQL, not just disabled in the UI. If a Scout execution itself fails, the run is refunded. Other agents do not consume Scout scans. A separate hourly agent-run guard limits accidental API spend.
+
+To change one tester's allowance, update `public.user_usage.scan_limit` in Supabase.
+
+## 5. Upwork
+
+Upwork is optional. Configure the official OAuth/API credentials on the API host, set the redirect URL to:
 
 ```text
-https://api.upwork.com/graphql
+https://YOUR_API_HOST/api/integrations/upwork/callback
 ```
 
-Scout obtains `ciphertext` from `marketplaceJobPostingsContents` and builds the original listing link as:
+Set `OAUTH_ENCRYPTION_KEY`. OAuth tokens are encrypted before being stored in Supabase and belong to the authenticated user who started the OAuth flow.
+
+## 6. Deployment
+
+Recommended private beta:
 
 ```text
-https://www.upwork.com/jobs/<ciphertext>
+Web: Vercel or Railway
+API: Railway / Render / Fly / VPS
+Auth + DB: Supabase
+Redis: optional (only for multiple API replicas)
 ```
 
-If Upwork changes a GraphQL field/filter, change only `apps/api/src/sources/upwork-source.ts`; the agents and UI do not change.
-
-## Configure what “best for us” means
-
-Open **Company profile** in the UI. Configure:
-
-- skills and 1–5 strength
-- services
-- preferred project keywords
-- avoid keywords
-- minimum fixed budget
-- minimum hourly rate
-- maximum desired project length
-- weekly delivery capacity
-- preferred regions
-- real portfolio evidence
-- proposal tone
-
-The profile is persisted locally in:
+For Railway/Render, use:
 
 ```text
-apps/api/data/company-profile.json
+Build: npm run build -w @revenue-agent/api
+Start: npm run start -w @revenue-agent/api
 ```
 
-For a multi-user deployment, replace this file store with PostgreSQL/MongoDB later.
+and set the service root/repository configuration according to the host. The API listens on `process.env.PORT` and `0.0.0.0`.
 
-## Opportunity scoring
+The two Dockerfiles at repository root provide another portable deployment path.
 
-Scout deliberately uses two levels:
+## Security model
 
-```text
-all discovered projects
-        ↓
-fast deterministic score
-(skill + budget + competition + recency + preferred/avoid signals)
-        ↓
-top candidates only
-        ↓
-AI commercial/technical review
-        ↓
-combined final score
-        ↓
-ranked Top 10
-```
+- Supabase access token required for all company/agent endpoints.
+- Socket.IO authenticates with the same access token.
+- A user can subscribe only to their own run room.
+- Service-role key stays on the API.
+- Per-user Upwork OAuth tokens are encrypted at rest by the application.
+- CORS restricts browser origins to `WEB_ORIGIN`.
+- Helmet + request rate limiting enabled.
+- Human approval remains required before sending proposals/outreach externally.
+- Private beta pages are `noindex`.
 
-This is cheaper and more auditable than sending every marketplace listing directly to an LLM.
+## Before public launch
 
-## Adding another project source
+This is designed for controlled demos and early private users. Before open public signup/payment, add billing, admin/audit tooling, automated integration tests, monitoring/error reporting, backups/retention policy, legal/privacy pages, email abuse controls and a durable background job queue for long-running agent workflows.
 
-Implement `OpportunitySource` in `apps/api/src/sources/`:
+## Agent input guide and demo data
 
-```ts
-export const newSource: OpportunitySource = {
-  status() {
-    return {
-      id: "new-source",
-      label: "New Source",
-      platform: "other",
-      configured: true,
-    };
-  },
-
-  async search(input) {
-    return [
-      {
-        id: "new-source:123",
-        sourceId: "123",
-        platform: "other",
-        platformLabel: "New Source",
-        title: "...",
-        description: "...",
-        budget: "...",
-        skills: [],
-        clientInfo: "...",
-        url: "https://original-project-link"
-      }
-    ];
-  }
-};
-```
-
-Register it in `apps/api/src/sources/index.ts`.
-
-## Adding another agent
-
-Create a folder under `apps/api/src/agents/`, implement `AgentDefinition`, and register it in `apps/api/src/agents/index.ts`. The sidebar is loaded from the API so the UI automatically sees registered agents; create a workspace component only when that agent needs a custom result view.
-
-## Safety / operating rule
-
-The system recommends and drafts. A human reviews before bidding, messaging a client, committing price, or accepting scope.
+Open `/agents-guide` in the web app for agent-specific input guidance and ready-to-paste demo briefs. The same tailored guidance appears beside each generic agent input. A complete copyable demo library is also available at `docs/DEMO_INPUTS.md`.
